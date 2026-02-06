@@ -23,8 +23,8 @@ cd robot-g1-Handover
 # 3. Uruchom demonstrację
 ros2 launch g1_pick_and_handover full_handover_pipeline.launch.py
 
-# 4. W osobnym terminalu - symuluj dane z kamery
-ros2 bag play demo_data.bag --loop
+# 4. W osobnym terminalu - odtwórz własne dane z kamery (rosbag z odpowiednimi tematami)
+ros2 bag play <twoj_plik_rosbag.bag> --loop
 ```
 
 📖 **Pierwszy raz z ROS 2?** Zobacz [szczegółową instrukcję instalacji](#-instalacja) poniżej.
