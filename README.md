@@ -468,6 +468,66 @@ python -m mujoco.viewer
 - Planner: RRTConnect (algorytm planowania trajektorii)
 - Range: 0.3 (zakres próbkowania dla RRT)
 
+---
+
+## ❓ Najczęstsze pytania (Quick FAQ)
+
+<details>
+<summary><b>❌ System nie uruchamia się - co robić?</b></summary>
+
+**Kroki diagnozy:**
+1. Sprawdź czy ROS 2 jest zainstalowany: `ros2 --version`
+2. Source workspace: `source ~/ros2_ws/install/setup.bash`
+3. Sprawdź pakiet: `ros2 pkg list | grep g1_pick_and_handover`
+4. Zobacz szczegóły: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+
+</details>
+
+<details>
+<summary><b>📷 Kamera nie działa - jak naprawić?</b></summary>
+
+**Szybkie rozwiązania:**
+1. Fizyczna kamera: `ros2 run realsense2_camera realsense2_camera_node`
+2. Bez kamery: Użyj bag file `ros2 bag play test_data.bag --loop`
+3. Zobacz: [TROUBLESHOOTING.md](TROUBLESHOOTING.md#-problem-brak-kamery)
+
+</details>
+
+<details>
+<summary><b>🎯 YOLO nie wykrywa obiektów - dlaczego?</b></summary>
+
+**Sprawdź:**
+- Czy obiekt jest w zbiorze COCO (80 klas)?
+- Obniż próg: `--ros-args -p confidence_threshold:=0.3`
+- Większy model: `-p model_name:=yolov5m`
+- Zobacz: [FAQ.md](FAQ.md#q-yolov5-nie-wykrywa-obiektów)
+
+</details>
+
+<details>
+<summary><b>⚠️ "WMA not available" - czy to błąd?</b></summary>
+
+**NIE, to normalne!** 🎉
+
+System automatycznie używa prostego trybu decyzyjnego (if-else), który działa świetnie do nauki i testów. WMA jest opcjonalny i zaawansowany. Zobacz: [FAQ.md](FAQ.md#q-wma-nie-jest-dostępny)
+
+</details>
+
+<details>
+<summary><b>🦾 MoveIt nie planuje - co sprawdzić?</b></summary>
+
+**Checklist:**
+- [ ] Cel w zasięgu? (0.3-0.8m dla G1)
+- [ ] Zwiększ timeout: `self.arm.set_planning_time(15.0)`
+- [ ] Zwiększ tolerancję: `self.arm.set_goal_position_tolerance(0.01)`
+- [ ] Zobacz: [FAQ.md](FAQ.md#q-moveit-2-nie-planuje-trajektorii)
+
+</details>
+
+**Więcej pytań?** Zobacz pełne [FAQ.md](FAQ.md)
+
+---
+
 ## 🐛 Rozwiązywanie problemów
 
 ### ⚡ Szybkie rozwiązania najczęstszych problemów
@@ -589,6 +649,7 @@ System automatycznie przełącza się na prosty tryb decyzyjny oparty na reguła
 
 ### 🚀 Start szybki
 - **[QUICK_START.md](QUICK_START.md)** - ⚡ 5-minutowy przewodnik instalacji i uruchomienia
+- **[EXAMPLES.md](EXAMPLES.md)** - 💻 Gotowe przykłady kodu do skopiowania
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - 🔍 Flowchart rozwiązywania problemów
 
 ### 📖 Podstawowa Dokumentacja
