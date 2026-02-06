@@ -181,9 +181,8 @@ debug:
 #    ros2 launch g1_pick_and_handover full_handover_pipeline.launch.py \
 #        config_preset:=beginner
 #
-# 4. LUB ustaw w kodzie:
-#    from config.presets import PRESETS
-#    params = PRESETS['intermediate']
+# 4. LUB załaduj ten plik YAML bezpośrednio w swoim kodzie (np. w Pythonie).
+#    (Aktualnie repozytorium nie udostępnia gotowego modułu `config.presets`.)
 #
 # ============================================================================
 # TWORZENIE WŁASNEGO PRESETU
