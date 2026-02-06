@@ -649,8 +649,10 @@ System automatycznie przełącza się na prosty tryb decyzyjny oparty na reguła
 
 ### 🚀 Start szybki
 - **[QUICK_START.md](QUICK_START.md)** - ⚡ 5-minutowy przewodnik instalacji i uruchomienia
+- **[STATUS.md](STATUS.md)** - 📊 Dashboard statusu systemu i wydajności
 - **[EXAMPLES.md](EXAMPLES.md)** - 💻 Gotowe przykłady kodu do skopiowania
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - 🔍 Flowchart rozwiązywania problemów
+- **[CHECKLIST.md](CHECKLIST.md)** - ✅ Lista kontrolna postępów
 
 ### 📖 Podstawowa Dokumentacja
 - **[FAQ.md](FAQ.md)** - ❓ Najczęściej zadawane pytania i rozwiązywanie problemów
