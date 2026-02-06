@@ -44,11 +44,20 @@ class ObjectDetector(Node):
         
         # Load YOLOv5 model with error handling
         try:
+            self.get_logger().info(f'📥 Loading YOLOv5 model "{self.model_name}"... (this may take a moment)')
             self.model = torch.hub.load(
                 "ultralytics/yolov5", self.model_name, pretrained=True)
-            self.get_logger().info(f'YOLOv5 model "{self.model_name}" loaded successfully')
+            self.get_logger().info(f'✅ YOLOv5 model "{self.model_name}" loaded successfully')
+            self.get_logger().info(f'🎯 Using confidence threshold: {self.confidence_threshold}')
         except Exception as e:
-            self.get_logger().error(f'Failed to load YOLOv5 model: {e}')
+            self.get_logger().error(
+                f'❌ Failed to load YOLOv5 model: {e}\n'
+                f'💡 Troubleshooting tips:\n'
+                f'   1. Check your internet connection (first run downloads model)\n'
+                f'   2. Install PyTorch: pip3 install torch torchvision\n'
+                f'   3. Try a different model: --ros-args -p model_name:=yolov5n\n'
+                f'   4. See FAQ.md for more help'
+            )
             raise
 
     def image_cb(self, msg: Image) -> None:
@@ -56,22 +65,29 @@ class ObjectDetector(Node):
         try:
             img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         except CvBridgeError as e:
-            self.get_logger().error(f'CV Bridge conversion error: {e}')
+            self.get_logger().error(
+                f'❌ CV Bridge conversion error: {e}\n'
+                f'💡 Tip: Check if camera is publishing correct image format'
+            )
             return
         
         if img is None or img.size == 0:
-            self.get_logger().warn('Received empty image')
+            self.get_logger().warn('⚠️ Received empty image - check camera connection')
             return
         
         try:
             results = self.model(img)
         except Exception as e:
-            self.get_logger().error(f'YOLOv5 inference error: {e}')
+            self.get_logger().error(
+                f'❌ YOLOv5 inference error: {e}\n'
+                f'💡 Tip: This might be a GPU/memory issue. Try a smaller model (yolov5n)'
+            )
             return
 
         det_msg = Detection2DArray()
         det_msg.header = msg.header
 
+        detections_count = 0
         for *xyxy, conf, cls in results.xyxy[0]:
             if conf < self.confidence_threshold:
                 continue
@@ -79,9 +95,14 @@ class ObjectDetector(Node):
             det = self._create_detection(xyxy, conf, int(cls))
             if det is not None:
                 det_msg.detections.append(det)
+                detections_count += 1
 
         self.pub.publish(det_msg)
-        self.get_logger().debug(f'Published {len(det_msg.detections)} detections')
+        
+        if detections_count > 0:
+            self.get_logger().info(f'🎯 Detected {detections_count} object(s)', throttle_duration_sec=2.0)
+        else:
+            self.get_logger().debug('⚪ No objects detected (or below confidence threshold)', throttle_duration_sec=5.0)
 
     def _create_detection(self, bbox, conf: float, cls: int) -> Optional[Detection2D]:
         """Tworzy wiadomość Detection2D z pojedynczego wykrycia YOLOv5"""

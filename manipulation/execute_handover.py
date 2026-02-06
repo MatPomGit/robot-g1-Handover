@@ -45,8 +45,16 @@ class ExecuteHandoverWMA(Node):
         
         try:
             self.moveit = MoveItInterface()
+            self.get_logger().info('✅ MoveIt 2 interface initialized')
         except Exception as e:
-            self.get_logger().error(f'Failed to initialize MoveIt: {e}')
+            self.get_logger().error(
+                f'❌ Failed to initialize MoveIt: {e}\n'
+                f'💡 Troubleshooting:\n'
+                f'   1. Make sure MoveIt 2 is installed: sudo apt install ros-humble-moveit\n'
+                f'   2. Check if robot description is available\n'
+                f'   3. Launch MoveIt demo: ros2 launch g1_moveit_config demo.launch.py\n'
+                f'   4. See ARCHITECTURE.md for more details'
+            )
             raise
         
         # Initialize WMA if available
@@ -54,13 +62,21 @@ class ExecuteHandoverWMA(Node):
             try:
                 from decision.wma_handover_manager import WMAHandoverManager
                 self.wma = WMAHandoverManager()
-                self.get_logger().info('WMA initialized successfully')
+                self.get_logger().info('🧠 WMA (World Model AI) initialized successfully')
             except Exception as e:
-                self.get_logger().warn(f'WMA initialization failed: {e}. Using mock mode.')
+                self.get_logger().warn(
+                    f'⚠️ WMA initialization failed: {e}\n'
+                    f'💡 Switching to mock decision mode (rule-based)\n'
+                    f'   This is normal and the system will work fine!'
+                )
                 self.wma = None
         else:
             self.wma = None
-            self.get_logger().warn('WMA not available - using mock decision making')
+            self.get_logger().info(
+                f'ℹ️ WMA not available - using mock decision making\n'
+                f'   💡 This is expected! The system uses simple if-else rules.\n'
+                f'   📖 See FAQ.md for more information about WMA'
+            )
 
         # State variables
         self.human_pose: Optional[PoseStamped] = None
@@ -165,52 +181,86 @@ class ExecuteHandoverWMA(Node):
     def execute_take(self) -> None:
         """Wykonuje akcję TAKE_FROM_HUMAN"""
         try:
+            self.get_logger().info('🤝 Starting TAKE_FROM_HUMAN sequence...')
+            
             pose = compute_handover_pose(self.human_pose)
             if pose is None:
-                self.get_logger().error('Failed to compute handover pose')
+                self.get_logger().error(
+                    '❌ Failed to compute handover pose\n'
+                    '💡 Check if human hand position is valid and within reach'
+                )
                 return
             
             # Safety check
             current_pose = self.moveit.get_current_pose()
             if current_pose and not validate_handover_safety(self.human_pose, current_pose):
-                self.get_logger().error('Handover position unsafe - aborting')
+                self.get_logger().error(
+                    '❌ Handover position unsafe - aborting\n'
+                    '💡 Human hand too close to robot (< 5cm safety margin)'
+                )
                 return
             
             # Execute movement
+            self.get_logger().info('🦾 Planning trajectory to handover position...')
             success = self.moveit.move_to_pose(pose)
             if success:
+                self.get_logger().info('✋ Closing gripper...')
                 self.moveit.close_gripper()
-                self.get_logger().info('Successfully took object from human')
+                self.get_logger().info('✅ Successfully took object from human!')
             else:
-                self.get_logger().error('Failed to move to handover position')
+                self.get_logger().error(
+                    '❌ Failed to move to handover position\n'
+                    '💡 Troubleshooting:\n'
+                    '   1. Check if position is within robot workspace (0.3-0.8m)\n'
+                    '   2. Increase planning time: self.arm.set_planning_time(15.0)\n'
+                    '   3. Check for collisions in RViz planning scene\n'
+                    '   4. See FAQ.md section "MoveIt 2 nie planuje trajektorii"'
+                )
                 
         except Exception as e:
-            self.get_logger().error(f'Error in execute_take: {e}')
+            self.get_logger().error(f'❌ Error in execute_take: {e}')
 
     def execute_give(self) -> None:
         """Wykonuje akcję GIVE_TO_HUMAN"""
         try:
+            self.get_logger().info('📦 Starting GIVE_TO_HUMAN sequence...')
+            
             pose = compute_handover_pose(self.human_pose)
             if pose is None:
-                self.get_logger().error('Failed to compute handover pose')
+                self.get_logger().error(
+                    '❌ Failed to compute handover pose\n'
+                    '💡 Check if human hand position is valid and within reach'
+                )
                 return
             
             # Safety check
             current_pose = self.moveit.get_current_pose()
             if current_pose and not validate_handover_safety(self.human_pose, current_pose):
-                self.get_logger().error('Handover position unsafe - aborting')
+                self.get_logger().error(
+                    '❌ Handover position unsafe - aborting\n'
+                    '💡 Human hand too close to robot (< 5cm safety margin)'
+                )
                 return
             
             # Execute movement
+            self.get_logger().info('🦾 Planning trajectory to handover position...')
             success = self.moveit.move_to_pose(pose)
             if success:
+                self.get_logger().info('✋ Opening gripper to release object...')
                 self.moveit.open_gripper()
-                self.get_logger().info('Successfully gave object to human')
+                self.get_logger().info('✅ Successfully gave object to human!')
             else:
-                self.get_logger().error('Failed to move to handover position')
+                self.get_logger().error(
+                    '❌ Failed to move to handover position\n'
+                    '💡 Troubleshooting:\n'
+                    '   1. Check if position is within robot workspace (0.3-0.8m)\n'
+                    '   2. Increase planning time: self.arm.set_planning_time(15.0)\n'
+                    '   3. Check for collisions in RViz planning scene\n'
+                    '   4. See FAQ.md section "MoveIt 2 nie planuje trajektorii"'
+                )
                 
         except Exception as e:
-            self.get_logger().error(f'Error in execute_give: {e}')
+            self.get_logger().error(f'❌ Error in execute_give: {e}')
 
 
 def main(args=None):

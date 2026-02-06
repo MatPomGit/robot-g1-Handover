@@ -1,0 +1,205 @@
+# Presety konfiguracyjne (Configuration Presets)
+#
+# Ten plik zawiera gotowe konfiguracje dla różnych scenariuszy użycia.
+# Skopiuj odpowiednią sekcję do config/grasp_params.yaml
+
+# ============================================================================
+# PRESET 1: BEGINNER (Początkujący)
+# ============================================================================
+# Zalecane dla: Pierwszych testów, nauki systemu, symulacji
+# Charakterystyka: Wolne, bezpieczne, konserwatywne parametry
+# ============================================================================
+
+beginner:
+  grasp:
+    # Chwytanie - konserwatywne odległości
+    approach_distance: 0.15        # [m] Większy offset = bezpieczniej
+    lift_distance: 0.20            # [m] Wyższe podniesienie
+    gripper_open: 0.05             # [m] Szersze otwarcie
+    gripper_closed: 0.005          # [m] Delikatne zamknięcie
+    max_force: 25.0                # [N] Mniejsza siła
+    
+  moveit:
+    # Planowanie - więcej czasu, wolniejsze ruchy
+    planning_time: 15.0            # [s] Dużo czasu na planowanie
+    max_velocity_scaling: 0.2      # 20% max prędkości - bardzo wolno
+    max_acceleration_scaling: 0.2  # 20% max przyspieszenia
+    
+  perception:
+    # Detekcja - niższy próg = więcej detekcji
+    yolo_confidence: 0.4           # Niski próg pewności
+    detection_rate: 10             # [Hz] Wolniejsza detekcja
+    
+  safety:
+    # Bezpieczeństwo - bardzo konserwatywne
+    emergency_stop_distance: 0.10  # [m] Duża strefa bezpieczeństwa
+    collision_padding: 0.05        # [m] Dodatkowy margines
+
+# ============================================================================
+# PRESET 2: INTERMEDIATE (Średniozaawansowany)
+# ============================================================================
+# Zalecane dla: Pracy z prawdziwym robotem, demonstracji, testów
+# Charakterystyka: Zbalansowane parametry, dobry kompromis
+# ============================================================================
+
+intermediate:
+  grasp:
+    # Chwytanie - standardowe parametry
+    approach_distance: 0.10        # [m] Standardowy offset
+    lift_distance: 0.15            # [m] Standardowe podniesienie
+    gripper_open: 0.04             # [m] Standardowe otwarcie
+    gripper_closed: 0.0            # [m] Pełne zamknięcie
+    max_force: 30.0                # [N] Standardowa siła
+    
+  moveit:
+    # Planowanie - zbalansowane
+    planning_time: 10.0            # [s] Standardowy czas
+    max_velocity_scaling: 0.4      # 40% max prędkości
+    max_acceleration_scaling: 0.4  # 40% max przyspieszenia
+    
+  perception:
+    # Detekcja - zbalansowana pewność
+    yolo_confidence: 0.6           # Standardowy próg
+    detection_rate: 20             # [Hz] Standardowa częstotliwość
+    
+  safety:
+    # Bezpieczeństwo - standardowe
+    emergency_stop_distance: 0.05  # [m] Standardowa strefa
+    collision_padding: 0.02        # [m] Standardowy margines
+
+# ============================================================================
+# PRESET 3: ADVANCED (Zaawansowany)
+# ============================================================================
+# Zalecane dla: Produkcji, szybkich operacji, doświadczonych użytkowników
+# Charakterystyka: Szybkie, precyzyjne, wymaga doświadczenia
+# ============================================================================
+
+advanced:
+  grasp:
+    # Chwytanie - precyzyjne parametry
+    approach_distance: 0.08        # [m] Mniejszy offset = szybciej
+    lift_distance: 0.12            # [m] Niższe podniesienie
+    gripper_open: 0.04             # [m] Standardowe otwarcie
+    gripper_closed: 0.0            # [m] Pełne zamknięcie
+    max_force: 35.0                # [N] Większa siła
+    
+  moveit:
+    # Planowanie - szybkie
+    planning_time: 5.0             # [s] Mniej czasu
+    max_velocity_scaling: 0.6      # 60% max prędkości
+    max_acceleration_scaling: 0.6  # 60% max przyspieszenia
+    
+  perception:
+    # Detekcja - wyższa pewność
+    yolo_confidence: 0.7           # Wyższy próg = pewniejsze detekcje
+    detection_rate: 30             # [Hz] Szybsza detekcja
+    
+  safety:
+    # Bezpieczeństwo - optymalizowane
+    emergency_stop_distance: 0.05  # [m] Standardowa strefa
+    collision_padding: 0.01        # [m] Mniejszy margines
+
+# ============================================================================
+# PRESET 4: SIMULATION (Symulacja)
+# ============================================================================
+# Zalecane dla: Gazebo, MuJoCo, bez fizycznego robota
+# Charakterystyka: Bez ograniczeń bezpieczeństwa, szybkie
+# ============================================================================
+
+simulation:
+  grasp:
+    # Chwytanie - idealne warunki
+    approach_distance: 0.10        # [m] Standardowy offset
+    lift_distance: 0.15            # [m] Standardowe podniesienie
+    gripper_open: 0.04             # [m] Standardowe otwarcie
+    gripper_closed: 0.0            # [m] Pełne zamknięcie
+    max_force: 50.0                # [N] Większa siła (symulator)
+    
+  moveit:
+    # Planowanie - bez limitów
+    planning_time: 5.0             # [s] Szybkie planowanie
+    max_velocity_scaling: 1.0      # 100% max prędkości
+    max_acceleration_scaling: 1.0  # 100% max przyspieszenia
+    
+  perception:
+    # Detekcja - perfekcyjna
+    yolo_confidence: 0.8           # Bardzo wysoka pewność (perfect data)
+    detection_rate: 30             # [Hz] Szybka detekcja
+    
+  safety:
+    # Bezpieczeństwo - minimalne (to symulator!)
+    emergency_stop_distance: 0.02  # [m] Mała strefa
+    collision_padding: 0.005       # [m] Minimalny margines
+
+# ============================================================================
+# PRESET 5: DEBUG (Debugowanie)
+# ============================================================================
+# Zalecane dla: Diagnozowanie problemów, rozwój systemu
+# Charakterystyka: Ekstremalne logi, bardzo wolne, maksimum informacji
+# ============================================================================
+
+debug:
+  grasp:
+    # Chwytanie - z długimi pauzami na obserwację
+    approach_distance: 0.15        # [m] Duży offset
+    lift_distance: 0.20            # [m] Wysokie podniesienie
+    gripper_open: 0.05             # [m] Szerokie otwarcie
+    gripper_closed: 0.005          # [m] Delikatne
+    max_force: 20.0                # [N] Mała siła
+    pause_between_steps: 3.0       # [s] Pauza między krokami
+    
+  moveit:
+    # Planowanie - maksymalnie szczegółowe
+    planning_time: 30.0            # [s] Bardzo dużo czasu
+    max_velocity_scaling: 0.1      # 10% prędkości - bardzo wolno!
+    max_acceleration_scaling: 0.1  # 10% przyspieszenia
+    
+  perception:
+    # Detekcja - wszystko logowane
+    yolo_confidence: 0.3           # Niski próg = więcej detekcji
+    detection_rate: 5              # [Hz] Wolno, więcej czasu na analizę
+    log_all_detections: true       # Loguj wszystkie detekcje
+    
+  safety:
+    # Bezpieczeństwo - ekstremalne
+    emergency_stop_distance: 0.15  # [m] Bardzo duża strefa
+    collision_padding: 0.08        # [m] Bardzo duży margines
+
+# ============================================================================
+# INSTRUKCJE UŻYCIA
+# ============================================================================
+#
+# Aby użyć presetu:
+#
+# 1. Wybierz odpowiedni preset z listy powyżej
+#
+# 2. Skopiuj sekcję do config/grasp_params.yaml:
+#    cp config/presets.yaml config/grasp_params.yaml
+#    # Potem edytuj i zostaw tylko wybrany preset
+#
+# 3. LUB użyj parametru przy uruchomieniu:
+#    ros2 launch g1_pick_and_handover full_handover_pipeline.launch.py \
+#        config_preset:=beginner
+#
+# 4. LUB ustaw w kodzie:
+#    from config.presets import PRESETS
+#    params = PRESETS['intermediate']
+#
+# ============================================================================
+# TWORZENIE WŁASNEGO PRESETU
+# ============================================================================
+#
+# Możesz stworzyć własny preset bazując na istniejących:
+#
+# custom:
+#   grasp:
+#     approach_distance: 0.12      # Twoja wartość
+#     lift_distance: 0.18          # Twoja wartość
+#     # ... itd
+#
+# Pamiętaj o dokumentowaniu parametrów komentarzami!
+#
+# ============================================================================
+
+# Domyślny preset (intermediate)
+default: intermediate
