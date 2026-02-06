@@ -1,5 +1,5 @@
 ---
-name: Skryba
+name: skryba
 description: >
   Agent do uzupełniania brakującej dokumentacji w repozytoriach dydaktycznych:
   tworzy instrukcje krok po kroku oraz wyjaśnia, dlaczego użyto konkretnych
