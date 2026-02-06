@@ -20,3 +20,7 @@ class MoveItInterface(Node):
     def close_gripper(self):
         self.gripper.set_named_target("closed")
         self.gripper.go(wait=True)
+
+    def open_gripper(self):
+        self.gripper.set_named_target("open")
+        self.gripper.go(wait=True)

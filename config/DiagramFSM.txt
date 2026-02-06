@@ -1,0 +1,29 @@
+          ┌───────────────┐
+          │     IDLE      │
+          └──────┬────────┘
+                 │
+     human_reaching=True
+     gripper_occupied=False
+                 ▼
+      ┌────────────────────┐
+      │  TAKE_FROM_HUMAN   │
+      └──────┬─────────────┘
+             │
+gripper_closed=True
+             ▼
+          ┌───────────────┐
+          │     HOLD      │
+          └──────┬────────┘
+                 │
+ human_reaching=True
+ gripper_occupied=True
+                 ▼
+      ┌────────────────────┐
+      │  GIVE_TO_HUMAN     │
+      └──────┬─────────────┘
+             │
+gripper_open=True
+             ▼
+          ┌───────────────┐
+          │     IDLE      │
+          └───────────────┘

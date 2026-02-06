@@ -1,0 +1,5 @@
+| WMA Action        | MoveIt Trajectory               | Chwytak         |
+| ----------------- | ------------------------------- | --------------- |
+| `TAKE_FROM_HUMAN` | move_to_pose(pre-grasp → grasp) | close_gripper() |
+| `GIVE_TO_HUMAN`   | move_to_pose(handover_pose)     | open_gripper()  |
+| `IDLE`            | brak ruchu                      | brak ruchu      |
