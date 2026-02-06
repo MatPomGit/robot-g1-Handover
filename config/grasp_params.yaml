@@ -1,6 +1,109 @@
+# ============================================================================
+# PARAMETRY CHWYTANIA (Grasp Parameters)
+# ============================================================================
+# 
+# Ten plik konfiguruje zachowanie robota podczas chwytania obiektów.
+# 
+# 💡 Wskazówki:
+#   - Zwiększ approach_distance dla wolniejszego, bezpieczniejszego ruchu
+#   - Zmniejsz dla szybszych operacji
+#   - Zobacz config/presets.yaml dla gotowych konfiguracji
+# 
+# 📖 Dokumentacja: README.md, EXAMPLES.md
+# ============================================================================
+
 grasp:
+  # ----------------------------------------------------------------------------
+  # Odległość podejścia (Approach Distance)
+  # ----------------------------------------------------------------------------
+  # Jak daleko przed obiektem robot zatrzyma się przed ostatecznym chwyceniem.
+  # 
+  # Wartości:
+  #   - 0.15m = Bardzo konserwatywne (BEGINNER) - wolne, bezpieczne
+  #   - 0.10m = Standardowe (INTERMEDIATE) - zbalansowane ⭐ ZALECANE
+  #   - 0.08m = Agresywne (ADVANCED) - szybkie, wymaga precyzji
+  # 
+  # Jednostka: metry [m]
   approach_distance: 0.10
+  
+  # ----------------------------------------------------------------------------
+  # Wysokość podniesienia (Lift Height)
+  # ----------------------------------------------------------------------------
+  # O ile wysoko robot podniesie obiekt po chwyceniu.
+  # Wyższa wartość = bezpieczniej, ale wolniej.
+  # 
+  # Wartości:
+  #   - 0.20m = Wysoko (BEGINNER) - minimalizuje kolizje
+  #   - 0.15m = Standardowo (INTERMEDIATE) - zbalansowane ⭐ ZALECANE
+  #   - 0.12m = Nisko (ADVANCED) - szybciej, ale ryzykowniej
+  # 
+  # Jednostka: metry [m]
   lift_distance: 0.15
+  
+  # ----------------------------------------------------------------------------
+  # Otwarcie chwytaka (Gripper Open Width)
+  # ----------------------------------------------------------------------------
+  # Jak szeroko otworzyć chwytak przed chwyceniem.
+  # Większa wartość = bezpieczniej dla dużych obiektów.
+  # 
+  # Wartości:
+  #   - 0.05m = Szeroko (BEGINNER) - dla różnych wielkości obiektów
+  #   - 0.04m = Standardowo (INTERMEDIATE) - uniwersalne ⭐ ZALECANE
+  #   - 0.03m = Wąsko (ADVANCED) - dla małych, precyzyjnych obiektów
+  # 
+  # Jednostka: metry [m]
   gripper_open: 0.04
+  
+  # ----------------------------------------------------------------------------
+  # Zamknięcie chwytaka (Gripper Closed Width)
+  # ----------------------------------------------------------------------------
+  # Jak mocno zamknąć chwytak podczas chwytania.
+  # 
+  # Wartości:
+  #   - 0.005m = Delikatnie (BEGINNER) - dla delikatnych obiektów
+  #   - 0.0m = Całkowicie (INTERMEDIATE/ADVANCED) - maksymalna siła ⭐ ZALECANE
+  # 
+  # Uwaga: Faktyczna siła jest ograniczona przez max_force.
+  # 
+  # Jednostka: metry [m]
   gripper_closed: 0.0
+  
+  # ----------------------------------------------------------------------------
+  # Maksymalna siła (Maximum Force)
+  # ----------------------------------------------------------------------------
+  # Maksymalna siła jaką chwytak może wywierać na obiekt.
+  # Chroni przed uszkodzeniem obiektów i chwytaka.
+  # 
+  # Wartości:
+  #   - 20.0 N = Delikatnie (DEBUG) - dla testów
+  #   - 25.0 N = Lekko (BEGINNER) - bezpieczne dla większości obiektów
+  #   - 30.0 N = Standardowo (INTERMEDIATE) - zbalansowane ⭐ ZALECANE
+  #   - 35.0 N = Mocno (ADVANCED) - dla ciężkich obiektów
+  # 
+  # UWAGA: Nie przekraczaj 40N bez dobrego powodu!
+  # 
+  # Jednostka: Niutony [N]
   max_force: 30.0
+
+# ============================================================================
+# DODATKOWE UWAGI
+# ============================================================================
+#
+# 🎯 Quick Presets:
+#   - BEZPIECZNY (testy):    approach=0.15, lift=0.20, force=25.0
+#   - STANDARDOWY (produkcja): approach=0.10, lift=0.15, force=30.0
+#   - SZYBKI (demo):         approach=0.08, lift=0.12, force=30.0
+#
+# 🔧 Testowanie parametrów:
+#   1. Zawsze testuj w symulacji NAJPIERW
+#   2. Zacznij od konserwatywnych wartości
+#   3. Stopniowo optymalizuj
+#   4. Dokumentuj wyniki w logach
+#
+# 📚 Zobacz też:
+#   - config/presets.yaml - Gotowe konfiguracje
+#   - TUTORIALS.md Tutorial 5 - Eksperymentowanie z parametrami
+#   - EXAMPLES.md - Przykłady użycia w kodzie
+#
+# ============================================================================
+
