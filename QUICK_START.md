@@ -64,8 +64,8 @@ Jeśli nie masz kamery lub robota, możesz przetestować system w trybie symulac
 # TERMINAL 1: Uruchom system
 ros2 launch g1_pick_and_handover full_handover_pipeline.launch.py
 
-# TERMINAL 2: Symuluj dane z kamery (jeśli masz plik bag)
-ros2 bag play test_data.bag --loop
+# TERMINAL 2: Symuluj dane z kamery (używając własnego pliku .bag)
+ros2 bag play /sciezka/do/twojego_pliku.bag --loop
 
 # TERMINAL 3: Wizualizacja w RViz
 rviz2
