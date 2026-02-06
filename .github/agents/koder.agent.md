@@ -1,5 +1,5 @@
 ---
-name: koder-indywidualista
+name: koder
 description: >
   Samodzielny agent programistyczny analizujący całe repozytorium, listy ToDo
   oraz istniejący kod, a następnie aktywnie rozwijający projekt: pisze nowe
