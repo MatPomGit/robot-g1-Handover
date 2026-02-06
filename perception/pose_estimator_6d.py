@@ -11,7 +11,7 @@ KROK PO KROKU:
 1. Odbiera detekcje 2D (prostokąty na obrazie)
 2. Odbiera mapę głębokości z kamery
 3. Odczytuje głębokość w centrum każdego bounding boxa
-4. Konwertuje współrzędne 2D (piksele) na 3D (metry) używając pinihole camera model
+4. Konwertuje współrzędne 2D (piksele) na 3D (metry) używając pinhole camera model
 5. Publikuje pozycję 3D obiektu
 
 TOPIKI ROS 2:
