@@ -18,7 +18,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='Robot G1 Handover Team',
-    maintainer_email='todo@example.com',
+    maintainer_email='contact@robotg1handover.org',
     description='System przekazywania obiektów (handover) dla robota Unitree G1',
     license='MIT',
     entry_points={
