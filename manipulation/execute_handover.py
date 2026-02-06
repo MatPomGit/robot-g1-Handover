@@ -254,7 +254,7 @@ class ExecuteHandoverWMA(Node):
                     '❌ Failed to move to handover position\n'
                     '💡 Troubleshooting:\n'
                     '   1. Check if position is within robot workspace (0.3-0.8m)\n'
-                    '   2. Increase planning time: self.arm.set_planning_time(15.0)\n'
+                    '   2. Increase planning time: self.moveit.arm.set_planning_time(15.0)\n'
                     '   3. Check for collisions in RViz planning scene\n'
                     '   4. See FAQ.md section "MoveIt 2 nie planuje trajektorii"'
                 )
