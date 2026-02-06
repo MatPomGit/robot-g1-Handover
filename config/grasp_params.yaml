@@ -1,0 +1,6 @@
+grasp:
+  approach_distance: 0.10
+  lift_distance: 0.15
+  gripper_open: 0.04
+  gripper_closed: 0.0
+  max_force: 30.0

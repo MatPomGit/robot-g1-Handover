@@ -1,0 +1,16 @@
+g1_pick_and_handover/
+├── perception/
+│   ├── object_detector.py
+│   ├── pose_estimator_6d.py
+│   └── launch_perception.py
+├── manipulation/
+│   ├── moveit_interface.py
+│   ├── grasp_planner.py
+│   └── execute_grasp.py
+├── decision/
+│   └── wma_task_manager.py
+├── launch/
+│   └── full_pipeline.launch.py
+└── config/
+    ├── grasp_params.yaml
+    └── moveit.yaml
