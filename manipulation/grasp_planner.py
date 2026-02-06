@@ -9,6 +9,7 @@ from geometry_msgs.msg import PoseStamped
 from typing import Optional
 import sys
 import os
+import copy
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.constants import PREGRASP_OFFSET_Z, LIFT_HEIGHT, FRAME_BASE_LINK
 
@@ -28,10 +29,7 @@ def compute_pregrasp(object_pose: PoseStamped, offset_z: float = PREGRASP_OFFSET
         return None
     
     try:
-        pre = PoseStamped()
-        pre.header = object_pose.header
-        pre.pose = object_pose.pose
-        
+        pre = copy.deepcopy(object_pose)
         pre.pose.position.z += offset_z
         
         return pre
@@ -55,10 +53,7 @@ def compute_lift_pose(grasp_pose: PoseStamped, lift_height: float = LIFT_HEIGHT)
         return None
     
     try:
-        lift = PoseStamped()
-        lift.header = grasp_pose.header
-        lift.pose = grasp_pose.pose
-        
+        lift = copy.deepcopy(grasp_pose)
         lift.pose.position.z += lift_height
         
         return lift

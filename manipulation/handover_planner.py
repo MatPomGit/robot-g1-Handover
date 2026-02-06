@@ -9,6 +9,7 @@ from geometry_msgs.msg import PoseStamped
 from typing import Optional
 import sys
 import os
+import copy
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.constants import HANDOVER_OFFSET_Z, EMERGENCY_STOP_DISTANCE
 import math
@@ -30,10 +31,7 @@ def compute_handover_pose(human_hand_pose: PoseStamped,
         return None
     
     try:
-        pose = PoseStamped()
-        pose.header = human_hand_pose.header
-        pose.pose = human_hand_pose.pose
-        
+        pose = copy.deepcopy(human_hand_pose)
         pose.pose.position.z += offset_z
         
         return pose
