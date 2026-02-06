@@ -360,7 +360,27 @@ ros2 run realsense2_camera realsense2_camera_node
 2. Sprawdź ścieżkę do checkpointu WMA
 3. Sprawdź, czy obserwacje mają poprawny format
 
-## 📚 Dodatkowe Zasoby
+## 📚 Dokumentacja Projektu
+
+### 📖 Podstawowa Dokumentacja
+- **[FAQ.md](FAQ.md)** - Najczęściej zadawane pytania i rozwiązywanie problemów
+- **[TUTORIALS.md](TUTORIALS.md)** - Szczegółowe tutoriale krok po kroku dla studentów
+- **[GLOSSARY.md](GLOSSARY.md)** - Słownik terminów i konceptów
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Szybka ściąga z komendami i parametrami
+
+### 🏗️ Dokumentacja Techniczna
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Architektura systemu i przepływ danych
+- **[TESTING.md](TESTING.md)** - Strategia i implementacja testów
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Przewodnik dla kontrybutorów
+
+### 📁 Dokumentacja Modułów
+- **[perception/README.md](perception/README.md)** - Moduł percepcji (kamery, detekcja)
+- **[manipulation/README.md](manipulation/README.md)** - Moduł manipulacji (MoveIt, grasp)
+- **[decision/README.md](decision/README.md)** - Moduł decyzyjny (WMA, FSM)
+- **[launch/README.md](launch/README.md)** - Pliki uruchomieniowe
+- **[config/README.md](config/README.md)** - Pliki konfiguracyjne
+
+## 🌐 Zewnętrzne Zasoby
 
 - [ROS 2 Documentation](https://docs.ros.org/en/humble/)
 - [MoveIt 2 Tutorials](https://moveit.picknik.ai/humble/index.html)
