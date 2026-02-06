@@ -108,10 +108,8 @@ sudo apt install ros-humble-moveit
 # Zainstaluj pip jeśli nie masz
 sudo apt install python3-pip
 
-# Zainstaluj wymagane pakiety
-pip3 install torch torchvision
-pip3 install opencv-python
-pip3 install mediapipe  # dla detekcji dłoni
+# Zainstaluj wymagane pakiety z pliku requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ### Krok 4: Klonowanie i konfiguracja workspace
@@ -271,13 +269,20 @@ gripper_open=True
 ```
 robot-g1-Handover/
 ├── README.md                    # Ten plik
+├── CONTRIBUTING.md              # Przewodnik dla kontrybutorów
+├── requirements.txt             # Zależności Python
+├── package.xml                  # Deskryptor pakietu ROS 2
+├── setup.py                     # Konfiguracja instalacji Python
+├── setup.cfg                    # Konfiguracja setuptools
 ├── perception/                  # Moduł percepcji
+│   ├── __init__.py
 │   ├── README.md
 │   ├── human_hand_detector.py
 │   ├── object_detector.py
 │   ├── pose_estimator_6d.py
 │   └── static_tf_camera.py
 ├── manipulation/                # Moduł manipulacji
+│   ├── __init__.py
 │   ├── README.md
 │   ├── moveit_interface.py
 │   ├── handover_planner.py
@@ -286,20 +291,19 @@ robot-g1-Handover/
 │   ├── execute_handover.py
 │   └── planning_scene.py
 ├── decision/                    # Moduł decyzyjny
+│   ├── __init__.py
 │   ├── README.md
 │   ├── wma_handover_manager.py
 │   └── wma_task_manager.py
 ├── launch/                      # Pliki uruchomieniowe
 │   ├── README.md
 │   ├── full_pipeline.launch.py
-│   └── full_handover_pipeline.launch.py
+│   ├── full_handover_pipeline.launch.py
+│   └── launch_perception.launch.py
 └── config/                      # Pliki konfiguracyjne
     ├── README.md
     ├── grasp_params.yaml
-    ├── moveit.yaml
-    ├── DiagramFSM.txt
-    ├── Struktura pakietów ROS 2.txt
-    └── Mapowanie WMA na trajektorie MoveIt 2.yaml
+    └── moveit.yaml
 ```
 
 ## 🔍 Wizualizacja z MuJoCo

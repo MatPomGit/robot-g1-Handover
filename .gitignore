@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.directory
+Thumbs.db
+
+# ROS 2 build artifacts
+install/
+log/
+
+# PyTorch / ML
+*.pth
+*.pt
+*.onnx
+*.trt
+
+# Jupyter
+.ipynb_checkpoints/

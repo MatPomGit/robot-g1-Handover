@@ -2,9 +2,25 @@
 
 ## 📖 Wprowadzenie
 
-Katalog `config/` zawiera pliki konfiguracyjne dla różnych komponentów systemu. Pliki te definiują parametry, mapowania i diagramy używane przez robot.
+Katalog `config/` zawiera pliki konfiguracyjne dla różnych komponentów systemu oraz dokumentację architektoniczną.
 
-## 📁 Dostępne Pliki
+## 📁 Pliki Konfiguracyjne (ładowane przez node'y)
+
+- `grasp_params.yaml` - Parametry chwytania obiektów
+- `moveit.yaml` - Konfiguracja MoveIt 2 (planowanie ruchu)
+
+## 📁 Dokumentacja Architektoniczna
+
+- `DiagramFSM.txt` - Diagram automatu stanów (FSM)
+- `Struktura pakietów ROS 2.txt` - Struktura pakietów ROS 2
+- `Mapowanie WMA na trajektorie MoveIt 2.yaml` - Mapowanie akcji WMA na MoveIt 2
+- `URDF.html` - Odnośnik do opisu URDF robota G1
+
+> **UWAGA**: Pliki dokumentacji architektonicznej powinny zostać przeniesione
+> do osobnego katalogu `docs/` w przyszłej reorganizacji repozytorium.
+> Nazwy plików powinny używać `snake_case` (bez spacji i polskich znaków).
+
+---
 
 ### 1. `grasp_params.yaml`
 **Parametry chwytania obiektów**
