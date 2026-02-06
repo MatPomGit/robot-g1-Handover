@@ -120,8 +120,9 @@ ros2 topic list | grep camera
   ```
   
   **Opcja B: Użyj bag file (dane testowe)**
+  > Uwaga: Repozytorium nie zawiera przykładowego pliku `.bag`. Użyj własnego nagrania ROS 2 (np. z `/camera/color/image_raw`) lub innego dostępnego pliku.
   ```bash
-  ros2 bag play test_data.bag --loop
+  ros2 bag play /sciezka/do/twojego_pliku.bag --loop
   ```
   
   **Opcja C: Symuluj topiki**
