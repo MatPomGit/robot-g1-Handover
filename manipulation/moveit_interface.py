@@ -3,168 +3,210 @@ Interfejs MoveIt 2 (MoveIt Interface)
 
 Ten moduł zapewnia uproszczony interfejs do planowania i wykonywania ruchów
 ramienia robota oraz sterowania chwytakiem za pomocą MoveIt 2.
-
-MoveIt 2 to zaawansowany framework do:
-- Planowania trajektorii bez kolizji
-- Kinematyki odwrotnej (IK) - obliczania kątów stawów dla zadanej pozycji końcówki
-- Unikania kolizji z przeszkodami
-- Sterowania manipulatorami
-
-KROK PO KROKU:
-1. Inicjalizuje MoveIt Commander dla ramienia i chwytaka
-2. Zapewnia metody do:
-   - Ruchu ramienia do zadanej pozycji (move_to_pose)
-   - Zamykania chwytaka (close_gripper)
-   - Otwierania chwytaka (open_gripper)
-
-GRUPY RUCHOWE (Move Groups):
-- "arm" = całe ramię robota (stawy od ramienia do nadgarstka)
-- "gripper" = chwytak (palce/szczęki)
-
-TOPIKI ROS 2:
-- Publikuje/subskrybuje różne topiki MoveIt 2 (trajektorie, stany, itp.)
 """
 
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
-from moveit_commander import MoveGroupCommander, PlanningSceneInterface
+from moveit_commander import MoveGroupCommander, PlanningSceneInterface, RobotCommander
+from typing import Optional, Tuple
+
+# Import configuration constants
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config.constants import (
+    ARM_MOVE_GROUP, GRIPPER_MOVE_GROUP,
+    MAX_VELOCITY_SCALE, MAX_ACCELERATION_SCALE,
+    MOVEMENT_TIMEOUT_SEC
+)
+
 
 class MoveItInterface(Node):
-    """
-    Node ROS 2 zapewniający interfejs do MoveIt 2
-    
-    Upraszcza sterowanie ramieniem robota i chwytakiem,
-    ukrywając złożoność bezpośredniego użycia MoveIt 2.
-    """
+    """Node ROS 2 zapewniający interfejs do MoveIt 2"""
 
     def __init__(self):
-        """
-        Inicjalizacja interfejsu MoveIt 2
-        
-        KROK PO KROKU:
-        1. Inicjalizuje node ROS 2
-        2. Tworzy MoveGroupCommander dla ramienia ("arm")
-        3. Tworzy MoveGroupCommander dla chwytaka ("gripper")
-        4. Inicjalizuje PlanningSceneInterface (scena z przeszkodami)
-        
-        UWAGA: Nazwy grup ("arm", "gripper") muszą odpowiadać tym zdefiniowanym
-        w konfiguracji MoveIt 2 (SRDF - Semantic Robot Description Format)
-        """
+        """Inicjalizacja interfejsu MoveIt 2"""
         super().__init__("moveit_interface")
         
-        # MoveGroupCommander dla ramienia robota
-        # Pozwala na planowanie i wykonywanie ruchów całego ramienia
-        # Grupa "arm" powinna być zdefiniowana w pliku .srdf robota
-        self.arm = MoveGroupCommander("arm")
-        
-        # MoveGroupCommander dla chwytaka
-        # Kontroluje otwieranie/zamykanie chwytaka (palców)
-        # Grupa "gripper" powinna być zdefiniowana w pliku .srdf robota
-        self.gripper = MoveGroupCommander("gripper")
-        
-        # PlanningSceneInterface zarządza sceną planowania
-        # Pozwala dodawać/usuwać przeszkody (stół, ściany, obiekty)
-        # MoveIt 2 będzie planował trajektorie unikające kolizji
-        self.scene = PlanningSceneInterface()
+        try:
+            self.robot = RobotCommander()
+            self.arm = MoveGroupCommander(ARM_MOVE_GROUP)
+            self.gripper = MoveGroupCommander(GRIPPER_MOVE_GROUP)
+            self.scene = PlanningSceneInterface()
+            
+            # Set velocity and acceleration scaling
+            self.arm.set_max_velocity_scaling_factor(MAX_VELOCITY_SCALE)
+            self.arm.set_max_acceleration_scaling_factor(MAX_ACCELERATION_SCALE)
+            
+            # Set planning timeout
+            self.arm.set_planning_time(MOVEMENT_TIMEOUT_SEC)
+            
+            self.get_logger().info('MoveIt Interface initialized successfully')
+            self.get_logger().info(f'Robot groups: {self.robot.get_group_names()}')
+            self.get_logger().info(f'End effector: {self.arm.get_end_effector_link()}')
+            
+        except Exception as e:
+            self.get_logger().error(f'Failed to initialize MoveIt Interface: {e}')
+            raise
 
-    def move_to_pose(self, pose: PoseStamped):
+    def move_to_pose(self, pose: PoseStamped, wait: bool = True) -> bool:
         """
         Przesuwa ramię robota do zadanej pozycji w przestrzeni
         
-        KROK PO KROKU:
-        1. Ustawia cel jako pozycję końcówki ramienia (end-effector)
-        2. Wywołuje planer MoveIt 2 (np. RRTConnect)
-        3. Planer oblicza trajektorię kątów stawów
-        4. Sprawdza kolizje na całej trajektorii
-        5. Jeśli plan jest poprawny, wykonuje ruch
+        Args:
+            pose: PoseStamped - docelowa pozycja i orientacja
+            wait: bool - czekać na zakończenie ruchu
+            
+        Returns:
+            bool - True jeśli ruch się powiódł, False w przeciwnym razie
+        """
+        try:
+            self.arm.set_pose_target(pose)
+            
+            success, plan, planning_time, error_code = self.arm.plan()
+            
+            if not success:
+                self.get_logger().error(
+                    f'Planning failed with error code: {error_code}'
+                )
+                return False
+            
+            self.get_logger().info(
+                f'Planning succeeded in {planning_time:.2f}s, executing...'
+            )
+            
+            execute_success = self.arm.execute(plan, wait=wait)
+            
+            if execute_success:
+                self.get_logger().info('Motion executed successfully')
+            else:
+                self.get_logger().error('Motion execution failed')
+                
+            return execute_success
+            
+        except Exception as e:
+            self.get_logger().error(f'Error in move_to_pose: {e}')
+            return False
+
+    def move_to_joint_values(self, joint_values: list, wait: bool = True) -> bool:
+        """
+        Przesuwa ramię do zadanych wartości kątów stawów
         
         Args:
-            pose: PoseStamped - docelowa pozycja i orientacja end-effectora
-                  - position (x, y, z) w metrach
-                  - orientation (quaternion) jako (x, y, z, w)
-                  - header.frame_id określa układ odniesienia
-        
-        KINEMATYKA ODWROTNA (IK):
-        MoveIt 2 automatycznie rozwiązuje problem IK:
-        - Dane: pozycja końcówki (x, y, z) + orientacja
-        - Oblicza: kąty wszystkich stawów ramienia
-        - Sprawdza: czy rozwiązanie jest osiągalne (w przestrzeni roboczej)
-        
-        PLANOWANIE TRAJEKTORII:
-        - Algorytm: RRTConnect (lub inne z OMPL)
-        - Próbkuje losowo przestrzeń konfiguracyjną
-        - Buduje drzewo połączeń bez kolizji
-        - Znajduje ścieżkę od aktualnej do docelowej konfiguracji
+            joint_values: list - lista wartości kątów dla każdego stawu
+            wait: bool - czekać na zakończenie ruchu
+            
+        Returns:
+            bool - True jeśli ruch się powiódł
         """
-        # Ustawienie docelowej pozycji dla końcówki ramienia
-        # set_pose_target automatycznie wywoła solver IK
-        self.arm.set_pose_target(pose)
-        
-        # Planowanie trajektorii
-        # plan() zwraca tuple (success: bool, trajectory: RobotTrajectory)
-        # success=True jeśli znaleziono poprawną trajektorię bez kolizji
-        plan = self.arm.plan()
-        
-        # Sprawdzamy, czy planowanie się powiodło
-        if plan[0]:
-            # Plan istnieje i jest poprawny
-            # Wykonujemy zaplanowaną trajektorię
-            # wait=True blokuje wykonanie do zakończenia ruchu
-            self.arm.execute(plan[1], wait=True)
-            # Robot wykonuje płynny ruch po zaplanowanej trajektorii
-        # else:
-            # Planowanie nie powiodło się (pozycja nieosiągalna lub kolizja)
-            # W produkcyjnym kodzie należy obsłużyć ten błąd
+        try:
+            self.arm.set_joint_value_target(joint_values)
+            return self.arm.go(wait=wait)
+        except Exception as e:
+            self.get_logger().error(f'Error in move_to_joint_values: {e}')
+            return False
 
-    def close_gripper(self):
+    def close_gripper(self, wait: bool = True) -> bool:
         """
-        Zamyka chwytak robota (chwyta obiekt)
+        Zamyka chwytak robota
         
-        KROK PO KROKU:
-        1. Ustawia named target "closed" dla chwytaka
-        2. Wykonuje ruch zamykający palce/szczęki
-        3. Czeka na zakończenie ruchu
-        
-        NAMED TARGETS:
-        Named targets to predefiniowane konfiguracje stawów zdefiniowane w SRDF:
-        - "closed" = chwytak zamknięty (palce złączone)
-        - "open" = chwytak otwarty (palce rozdzielone)
-        
-        SIŁA CHWYTANIA:
-        W rzeczywistych robotach należy monitorować:
-        - Siłę chwytania (force sensing)
-        - Prąd silników (current sensing)
-        - Feedback z czujników dotyku
-        Aby nie zniszczyć delikatnych obiektów
+        Args:
+            wait: bool - czekać na zakończenie
+            
+        Returns:
+            bool - True jeśli operacja się powiodła
         """
-        # Ustawienie celu jako named target "closed"
-        # "closed" musi być zdefiniowany w pliku .srdf chwytaka
-        self.gripper.set_named_target("closed")
-        
-        # Wykonanie ruchu zamykającego chwytak
-        # go() łączy planowanie i wykonanie w jednej komendzie
-        # wait=True czeka aż chwytak się całkowicie zamknie
-        self.gripper.go(wait=True)
+        try:
+            self.gripper.set_named_target("closed")
+            success = self.gripper.go(wait=wait)
+            if success:
+                self.get_logger().info('Gripper closed successfully')
+            else:
+                self.get_logger().error('Failed to close gripper')
+            return success
+        except Exception as e:
+            self.get_logger().error(f'Error in close_gripper: {e}')
+            return False
 
-    def open_gripper(self):
+    def open_gripper(self, wait: bool = True) -> bool:
         """
-        Otwiera chwytak robota (puszcza obiekt)
+        Otwiera chwytak robota
         
-        KROK PO KROKU:
-        1. Ustawia named target "open" dla chwytaka
-        2. Wykonuje ruch otwierający palce/szczęki
-        3. Czeka na zakończenie ruchu
-        
-        ZASTOSOWANIE:
-        - Przed chwyceniem obiektu (pre-grasp)
-        - Podczas przekazywania obiektu człowiekowi
-        - Po umieszczeniu obiektu na stole
+        Args:
+            wait: bool - czekać na zakończenie
+            
+        Returns:
+            bool - True jeśli operacja się powiodła
         """
-        # Ustawienie celu jako named target "open"
-        # "open" musi być zdefiniowany w pliku .srdf chwytaka
-        self.gripper.set_named_target("open")
+        try:
+            self.gripper.set_named_target("open")
+            success = self.gripper.go(wait=wait)
+            if success:
+                self.get_logger().info('Gripper opened successfully')
+            else:
+                self.get_logger().error('Failed to open gripper')
+            return success
+        except Exception as e:
+            self.get_logger().error(f'Error in open_gripper: {e}')
+            return False
+
+    def stop(self) -> None:
+        """Zatrzymuje wszystkie ruchy robota (emergency stop)"""
+        try:
+            self.arm.stop()
+            self.gripper.stop()
+            self.get_logger().warn('Emergency stop executed')
+        except Exception as e:
+            self.get_logger().error(f'Error in stop: {e}')
+
+    def get_current_pose(self) -> Optional[PoseStamped]:
+        """
+        Pobiera aktualną pozycję end-effectora
         
-        # Wykonanie ruchu otwierającego chwytak
-        # go() wykonuje ruch i czeka na zakończenie
-        self.gripper.go(wait=True)
+        Returns:
+            PoseStamped - aktualna pozycja lub None w przypadku błędu
+        """
+        try:
+            return self.arm.get_current_pose()
+        except Exception as e:
+            self.get_logger().error(f'Error getting current pose: {e}')
+            return None
+
+    def get_current_joint_values(self) -> Optional[list]:
+        """
+        Pobiera aktualne wartości kątów stawów
+        
+        Returns:
+            list - lista kątów lub None w przypadku błędu
+        """
+        try:
+            return self.arm.get_current_joint_values()
+        except Exception as e:
+            self.get_logger().error(f'Error getting joint values: {e}')
+            return None
+
+
+def main(args=None):
+    """Funkcja główna - test interfejsu MoveIt"""
+    rclpy.init(args=args)
+    
+    try:
+        node = MoveItInterface()
+        
+        # Test: wyświetl aktualną pozycję
+        current_pose = node.get_current_pose()
+        if current_pose:
+            node.get_logger().info(f'Current pose: {current_pose}')
+        
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        print(f'Error in MoveItInterface: {e}')
+    finally:
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

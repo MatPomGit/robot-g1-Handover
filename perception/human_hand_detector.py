@@ -1,149 +1,122 @@
 """
 Moduł detekcji dłoni człowieka (Human Hand Detector)
 
-Ten node ROS 2 wykrywa pozycję dłoni człowieka w przestrzeni 3D i określa,
-czy człowiek wyciąga rękę w kierunku robota (intencja przekazania/odebrania obiektu).
-
-KROK PO KROKU:
-1. Odbiera obraz z kamery RGB-D
-2. Używa MediaPipe lub OpenPose do wykrycia kluczowych punktów dłoni
-3. Oblicza pozycję 3D dłoni w układzie współrzędnych robota
-4. Publikuje pozycję dłoni i informację o intencji człowieka
-
-TOPIKI ROS 2:
-- Publikuje: /human_hand_pose (geometry_msgs/PoseStamped) - pozycja dłoni w 3D
-- Publikuje: /human_reaching (std_msgs/Bool) - czy człowiek wyciąga rękę
+UWAGA: Jest to wersja placeholder dla celów edukacyjnych.
+Pełna implementacja wymaga integracji z MediaPipe lub OpenPose.
 """
 
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+from typing import Optional
+import numpy as np
+
+# Configuration constants
+HAND_DETECTION_RATE_HZ = 30  # Detection rate
+DEFAULT_HAND_POSITION = [0.6, 0.0, 1.0]  # Default hand position [x, y, z] in meters
+
 
 class HumanHandDetector(Node):
     """
     Node ROS 2 do detekcji dłoni człowieka
     
-    Wykrywa pozycję dłoni w przestrzeni 3D oraz określa intencję człowieka
-    (czy wyciąga rękę w kierunku robota, aby dać lub wziąć obiekt).
+    UWAGA: Obecna implementacja jest placeholderem.
+    TODO: Zintegrować MediaPipe Hands lub OpenPose dla prawdziwej detekcji.
     """
 
     def __init__(self):
-        """
-        Inicjalizacja node'a HumanHandDetector
-        
-        Tworzy:
-        - Publisher dla pozycji dłoni (/human_hand_pose)
-        - Publisher dla intencji człowieka (/human_reaching)
-        """
+        """Inicjalizacja node'a HumanHandDetector"""
         super().__init__("human_hand_detector")
         
-        # Publisher dla pozycji dłoni w przestrzeni 3D
-        # PoseStamped zawiera: pozycję (x,y,z) + orientację (quaternion) + timestamp
         self.pub_pose = self.create_publisher(
             PoseStamped, "/human_hand_pose", 10)
         
-        # Publisher dla informacji, czy człowiek wyciąga rękę
-        # True = człowiek wyciąga rękę (chce dać/wziąć obiekt)
-        # False = człowiek nie wyciąga ręki (brak intencji)
         self.pub_intent = self.create_publisher(
             Bool, "/human_reaching", 10)
-
-    def detect_hand(self, image):
-        """
-        Wykrywa pozycję dłoni na obrazie z kamery
         
-        KROK PO KROKU:
-        1. Przetwarza obraz z kamery RGB
-        2. Używa MediaPipe Hand Tracking lub OpenPose
-        3. Wykrywa 21 kluczowych punktów dłoni
-        4. Oblicza centrum dłoni (średnia punktów)
-        5. Konwertuje pozycję 2D (piksele) na 3D (metry) używając mapy głębokości
+        self.bridge = CvBridge()
+        self.current_image: Optional[np.ndarray] = None
+        
+        # Subscribe to camera for future integration
+        self.create_subscription(
+            Image, "/camera/color/image_raw", self.image_cb, 10)
+        
+        # Timer for periodic updates
+        self.timer = self.create_timer(
+            1.0 / HAND_DETECTION_RATE_HZ, self.process)
+        
+        self.get_logger().warn(
+            'HumanHandDetector initialized in PLACEHOLDER mode. '
+            'Real hand detection not implemented yet.'
+        )
+
+    def image_cb(self, msg: Image) -> None:
+        """Callback odbierający obraz z kamery"""
+        try:
+            self.current_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        except CvBridgeError as e:
+            self.get_logger().error(f'Failed to convert image: {e}')
+
+    def detect_hand(self, image: Optional[np.ndarray]) -> list:
+        """
+        Wykrywa pozycję dłoni na obrazie
+        
+        TODO: Zintegrować MediaPipe Hands:
+        import mediapipe as mp
+        mp_hands = mp.solutions.hands
+        hands = mp_hands.Hands()
+        results = hands.process(image)
+        # Extract hand position from results.multi_hand_landmarks
         
         Args:
             image: Obraz z kamery RGB (numpy array, format BGR)
             
         Returns:
-            list: Pozycja dłoni [x, y, z] w metrach względem kamery
-            
-        TODO: Zintegrować prawdziwy MediaPipe/OpenPose zamiast placeholder
+            list: Pozycja dłoni [x, y, z] w metrach
         """
-        # PLACEHOLDER - w rzeczywistej implementacji tutaj byłby kod:
-        # import mediapipe as mp
-        # mp_hands = mp.solutions.hands
-        # hands = mp_hands.Hands()
-        # results = hands.process(image)
-        # # Wyciągnij pozycję środka dłoni z results.multi_hand_landmarks
-        
-        # Tymczasowa stała pozycja dla testów
-        # x=0.6m przed robotem, y=0.0m (centralnie), z=1.0m (wysokość biurka)
-        return [0.6, 0.0, 1.0]
+        # PLACEHOLDER - zwraca stałą pozycję
+        return DEFAULT_HAND_POSITION
 
-    def process(self):
-        """
-        Przetwarza detekcję i publikuje wyniki
+    def process(self) -> None:
+        """Przetwarza detekcję i publikuje wyniki"""
+        hand_position = self.detect_hand(self.current_image)
         
-        KROK PO KROKU:
-        1. Tworzy wiadomość PoseStamped dla pozycji dłoni
-        2. Ustawia ramkę odniesienia (base_link = baza robota)
-        3. Wypełnia pozycję xyz i orientację
-        4. Publikuje pozycję dłoni na topic /human_hand_pose
-        5. Publikuje informację o intencji na topic /human_reaching
-        
-        UWAGI:
-        - base_link to główny układ współrzędnych robota (środek podstawy)
-        - Orientacja w = 1.0 oznacza brak obrotu (quaternion jednostkowy)
-        - Ta metoda powinna być wywoływana cyklicznie (np. 30 Hz)
-        """
-        # Tworzymy wiadomość ROS 2 typu PoseStamped
         pose = PoseStamped()
-        
-        # Ustawiamy ramkę odniesienia na "base_link" (baza robota)
-        # Wszystkie współrzędne będą względem środka podstawy robota
+        pose.header.stamp = self.get_clock().now().to_msg()
         pose.header.frame_id = "base_link"
         
-        # Pozycja dłoni w metrach (w układzie base_link):
-        pose.pose.position.x = 0.6  # 60 cm przed robotem
-        pose.pose.position.y = 0.0  # Na środku (lewo-prawo)
-        pose.pose.position.z = 1.0  # 1 metr nad ziemią (wysokość biurka)
-        
-        # Orientacja jako quaternion (x, y, z, w)
-        # w=1.0, x=y=z=0 oznacza brak obrotu (orientacja neutralna)
+        pose.pose.position.x = hand_position[0]
+        pose.pose.position.y = hand_position[1]
+        pose.pose.position.z = hand_position[2]
         pose.pose.orientation.w = 1.0
 
-        # Publikujemy pozycję dłoni
-        # Inne node'y (np. execute_handover) mogą subskrybować ten topic
         self.pub_pose.publish(pose)
         
-        # Publikujemy informację, że człowiek wyciąga rękę (True)
-        # W rzeczywistej implementacji to byłoby wykrywane na podstawie:
-        # - kierunku ruchu dłoni (czy porusza się w stronę robota)
-        # - prędkości ruchu dłoni
-        # - odległości od robota
+        # Placeholder: zawsze True
+        # TODO: Implement real reaching detection based on:
+        # - Hand movement direction
+        # - Hand velocity
+        # - Distance from robot
         self.pub_intent.publish(Bool(data=True))
 
-def main():
-    """
-    Funkcja główna uruchamiająca node HumanHandDetector
+
+def main(args=None):
+    """Funkcja główna uruchamiająca node HumanHandDetector"""
+    rclpy.init(args=args)
     
-    KROK PO KROKU:
-    1. Inicjalizuje system ROS 2
-    2. Tworzy instancję node'a HumanHandDetector
-    3. Uruchamia pętlę przetwarzania (spin) - czeka na callbacki
-    4. Po zakończeniu (Ctrl+C) czyści zasoby ROS 2
-    
-    Użycie:
-        ros2 run g1_pick_and_handover human_hand_detector
-    """
-    # Krok 1: Inicjalizacja ROS 2
-    rclpy.init()
-    
-    # Krok 2: Utworzenie node'a
-    node = HumanHandDetector()
-    
-    # Krok 3: Uruchomienie pętli przetwarzania
-    # spin() blokuje wykonanie i przetwarza callbacki aż do Ctrl+C
-    rclpy.spin(node)
-    
-    # Krok 4: Czyszczenie po zakończeniu
-    rclpy.shutdown()
+    try:
+        node = HumanHandDetector()
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        print(f'Error in HumanHandDetector: {e}')
+    finally:
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

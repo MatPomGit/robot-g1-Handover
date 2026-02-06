@@ -4,7 +4,7 @@
   <name>g1_pick_and_handover</name>
   <version>0.1.0</version>
   <description>System przekazywania obiektów (handover) dla robota humanoidalnego Unitree G1</description>
-  <maintainer email="todo@example.com">Robot G1 Handover Team</maintainer>
+  <maintainer email="contact@robotg1handover.org">Robot G1 Handover Team</maintainer>
   <license>MIT</license>
 
   <depend>rclpy</depend>
