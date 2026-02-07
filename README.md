@@ -2,9 +2,12 @@
 
 [![ROS 2](https://img.shields.io/badge/ROS_2-Humble-blue)](https://docs.ros.org/en/humble/)
 [![Python](https://img.shields.io/badge/Python-3.10+-green)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-Open_Source-yellow)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)](RELEASE_NOTES.md)
 
 > **Edukacyjny system robotyki** demonstrujący inteligentną interakcję człowiek-robot z wykorzystaniem percepcji wizyjnej, planowania ruchu i AI.
+
+**🎉 Wersja 1.0.0 - Pierwsze stabilne wydanie!** Zobacz [Release Notes](RELEASE_NOTES.md) | [Changelog](CHANGELOG.md)
 
 ---
 
@@ -664,6 +667,15 @@ System automatycznie przełącza się na prosty tryb decyzyjny oparty na reguła
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - 🏛️ Architektura systemu i przepływ danych
 - **[TESTING.md](TESTING.md)** - 🧪 Strategia i implementacja testów
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - 🤝 Przewodnik dla kontrybutorów
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - 🚀 Instrukcje wdrożeniowe (Development, Testing, Production, Docker)
+
+### 📦 Zarządzanie Projektem
+- **[CHANGELOG.md](CHANGELOG.md)** - 📝 Historia zmian i wersji
+- **[RELEASE_NOTES.md](RELEASE_NOTES.md)** - 🎉 Informacje o wydaniach
+- **[MILESTONES.md](MILESTONES.md)** - 🎯 Kamienie milowe projektu (M1-M5)
+- **[PROJECTS.md](PROJECTS.md)** - 🚀 Projekty rozwojowe (P1-P6)
+- **[ROADMAP.md](ROADMAP.md)** - 🗺️ Mapa drogowa 2026-2028
+- **[ABOUT.md](ABOUT.md)** - 📄 Informacje dla GitHub (About, Topics)
 
 ### ⚙️ Konfiguracja
 - **[config/presets.yaml](config/presets.yaml)** - 🎚️ Gotowe presety: beginner, intermediate, advanced, simulation, debug
@@ -720,6 +732,10 @@ Jeśli masz pytania lub sugestie, otwórz Issue lub Pull Request na GitHubie!
 ---
 
 ## 📊 Status Projektu
+
+> **🎉 Wersja 1.0.0 - Pierwsze stabilne wydanie!**  
+> Zobacz [RELEASE_NOTES.md](RELEASE_NOTES.md) dla pełnych informacji o wydaniu.  
+> Historia zmian: [CHANGELOG.md](CHANGELOG.md) | Mapa drogowa: [ROADMAP.md](ROADMAP.md)
 
 | Moduł | Status | Notatki |
 |-------|--------|---------|
